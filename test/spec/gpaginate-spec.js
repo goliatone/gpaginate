@@ -1,7 +1,7 @@
-/*global define:true, describe:true , it:true , expect:true, 
+/*global define:true, describe:true , it:true , expect:true,
 beforeEach:true, sinon:true, spyOn:true , expect:true */
 /* jshint strict: false */
-define(['gpaginate', 'jquery'], function(GPaginate, $) {
+define(['gpaginate'], function(GPaginate) {
 
     describe('just checking', function() {
 
@@ -11,13 +11,8 @@ define(['gpaginate', 'jquery'], function(GPaginate, $) {
             expect(gpaginate).toBeTruthy();
         });
 
-        it('GPaginate should initialize', function() {
-            var gpaginate = new GPaginate();
-            var output   = gpaginate.init();
-            var expected = 'This is just a stub!';
-            expect(output).toEqual(expected);
-        });
-        
-    });
+        it('', function() {
 
+        });
+    });
 });
