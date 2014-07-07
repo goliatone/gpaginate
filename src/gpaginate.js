@@ -35,7 +35,7 @@
             return mod;
         };
     }
-}(this, "GPaginate", function() {
+}(this, "GPaginate", ['extend'], function(extend) {
 
     /**
      * Extend method.
@@ -43,19 +43,7 @@
      * @return {Object}        Resulting object from
      *                         meging target to params.
      */
-    var _extend = function extend(target) {
-        var sources = [].slice.call(arguments, 1);
-        sources.forEach(function(source) {
-            for (var property in source) {
-                if (source[property] && source[property].constructor &&
-                    source[property].constructor === Object) {
-                    target[property] = target[property] || {};
-                    target[property] = extend(target[property], source[property]);
-                } else target[property] = source[property];
-            }
-        });
-        return target;
-    };
+    var _extend = extend;
 
     /**
      * Shim console, make sure that if no console
@@ -96,7 +84,7 @@
     var GPaginate = function(config) {
         config = config || {};
 
-        config = _extend({}, GPaginate.defaults || options, config);
+        config = _extend({}, this.constructor.DEFAULTS, config);
 
         this.init(config);
     };
@@ -105,7 +93,7 @@
      * Make default options available so we
      * can override.
      */
-    GPaginate.defaults = options;
+    GPaginate.DEFAULTS = options;
 
     ///////////////////////////////////////////////////
     // PRIVATE METHODS
@@ -114,8 +102,8 @@
     GPaginate.prototype.init = function(config) {
         if (this.initialized) return this.logger.warn('Already initialized');
         this.initialized = true;
-        if (!data) throw new Error('Required Argument Missing')
-        if (!(data instanceof Array)) throw new Error('Invalid Argument Type')
+        if (!data) throw new Error('Required Argument Missing');
+        if (!(data instanceof Array)) throw new Error('Invalid Argument Type');
 
         console.log('GPaginate: Init!');
         _extend(this, config);
