@@ -2,13 +2,19 @@
 /* jshint strict: false */
 requirejs.config({
     paths: {
-        'jquery': 'jquery/jquery',
-        'gpaginate': 'gpaginate'
+        'gpaginate': 'gpaginate',
+        'extend': 'gextend/extend'
     }
 });
 
-define(['gpaginate', 'jquery'], function (GPaginate, $) {
+define(['gpaginate'], function(GPaginate) {
     console.log('Loading');
-	var gpaginate = new GPaginate();
-	gpaginate.init();
+    var pager = new GPaginate({
+        data: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+        pageSize: 5
+    });
+
+    console.log(pager.page())
+    console.log(pager.next())
+    console.log(pager.next())
 });
