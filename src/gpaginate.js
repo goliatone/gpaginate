@@ -102,8 +102,8 @@
     GPaginate.prototype.init = function(config) {
         if (this.initialized) return this.logger.warn('Already initialized');
         this.initialized = true;
-        if (!data) throw new Error('Required Argument Missing');
-        if (!(data instanceof Array)) throw new Error('Invalid Argument Type');
+        if (!config.data) throw new Error('Required Argument Missing');
+        if (!(config.data instanceof Array)) throw new Error('Invalid Argument Type');
 
         console.log('GPaginate: Init!');
         _extend(this, config);
