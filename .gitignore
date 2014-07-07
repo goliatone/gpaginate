@@ -79,3 +79,6 @@ results
 npm-debug.log
 node_modules
 
+### Project cruft
+.coverage
+.lib
