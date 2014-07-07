@@ -76,7 +76,24 @@
         current: 0,
         cycle: false,
         startIndex: 1,
-        pageSize: 10
+        pageSize: 10,
+        checkLowerBoundary: function(index) {
+            if (index > 1) return index;
+
+            this.emit('paginate.start');
+            index = this.startIndex;
+
+            return index;
+        },
+        checkUpperBoundary: function(index) {
+            if (index <= this.totalPages) return index;
+
+            this.emit('paginate.end');
+
+            index = this.cycle ? this.startIndex : this.totalPages;
+
+            return index;
+        }
     };
 
     /**
@@ -139,7 +156,7 @@
     GPaginate.prototype.init = function(config) {
         if (this.initialized) return this.logger.warn('Already initialized');
         this.initialized = true;
-
+        if (!config) throw new Error(GPaginate.ARGUMENT_MISSING_ERROR);
         if (!config.data) throw new Error(GPaginate.ARGUMENT_MISSING_ERROR);
         if (!(config.data instanceof Array)) throw new Error(GPaginate.INVALID_ARGUMENT_ERROR);
 
@@ -224,6 +241,8 @@
     /**
      * Handle lower boundary. If our `index`
      * is a negative value, make it first page.
+     * This is meant to be overridden by user.
+     * The default implementation provided
      * @param  {Number} index
      * @return {Number}
      */
@@ -239,6 +258,8 @@
     /**
      * Handle upper boundary. If `cycle` is `true`
      * we loop to `startIndex` else we stay in place.
+     *
+     *
      * @param  {Number} index
      * @return {Number}
      */
@@ -276,6 +297,10 @@
         return this.current < this.totalPages;
     };
 
+    /**
+     * PubSub `emit` stub method. This is
+     * meant to be overridden by user.
+     */
     GPaginate.prototype.emit = function() {};
     /**
      * Logger method, meant to be implemented by
