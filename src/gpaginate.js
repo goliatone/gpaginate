@@ -73,7 +73,10 @@
     ///////////////////////////////////////////////////
 
     var options = {
-
+        current: 0,
+        cycle: false,
+        startIndex: 1,
+        pageSize: 10
     };
 
     /**
@@ -82,12 +85,21 @@
      * @param  {object} config Configuration object.
      */
     var GPaginate = function(config) {
-        config = config || {};
-
-        config = _extend({}, this.constructor.DEFAULTS, config);
-
-        this.init(config);
+        if (config) this.init(config);
     };
+
+    /**
+     * GPaginate release VERSION number.
+     * Semantic Versioning
+     * @type {String}
+     */
+    GPaginate.VERSION = '0.0.0';
+
+    /**
+     * Update class with a name property.
+     * @type {[type]}
+     */
+    GPaginate.name = GPaginate.prototype.name = 'GPaginate';
 
     /**
      * Make default options available so we
@@ -95,50 +107,89 @@
      */
     GPaginate.DEFAULTS = options;
 
+    /**
+     * INVALID_ARGUMENT_ERROR message
+     * @type {String}
+     */
+    GPaginate.INVALID_ARGUMENT_ERROR = 'Invalid Argument Type';
+
+    /**
+     * ARGUMENT_MISSING_ERROR message
+     * @type {String}
+     */
+    GPaginate.ARGUMENT_MISSING_ERROR = 'Required Argument Missing';
+
+
+
     ///////////////////////////////////////////////////
-    // PRIVATE METHODS
+    // PUBLIC METHODS
     ///////////////////////////////////////////////////
 
+    /**
+     * Initialize the instance with default values
+     * and configuration options.
+     *
+     * @param  {Object} config Configuration object.
+     *
+     * @throws {Error} If `config` is missing a `data` property
+     * @throws {Error} If `data` is not an Array instance
+     *
+     * @return {this}
+     */
     GPaginate.prototype.init = function(config) {
         if (this.initialized) return this.logger.warn('Already initialized');
         this.initialized = true;
-        if (!config.data) throw new Error('Required Argument Missing');
-        if (!(config.data instanceof Array)) throw new Error('Invalid Argument Type');
+
+        if (!config.data) throw new Error(GPaginate.ARGUMENT_MISSING_ERROR);
+        if (!(config.data instanceof Array)) throw new Error(GPaginate.INVALID_ARGUMENT_ERROR);
 
         console.log('GPaginate: Init!');
+
+        config = _extend({}, this.constructor.DEFAULTS, config);
+
         _extend(this, config);
 
-        //TODO: We should get this from config.
-        this.current = 0;
-        this.cycle = false;
-        this.startIndex = 1;
-        this.defaultPageSize = 10;
+        this.setData(config.data);
 
-        this.data = data;
-        this.pageSize = pageSize || this.defaultPageSize;
-
-        this.total = Math.ceil(this.data.length / this.pageSize);
-
-
-
-        return 'This is just a stub!';
+        return this;
     };
+
     /**
-     * Calculate the current offset
-     * @return {Number}
+     * Resets the property.
+     * @param  {Object} config Configuration object.
+     * @return {this}
      */
-    GPaginate.prototype.offset = function() {
-        return ((this.current - 1) * this.pageSize);
+    GPaginate.prototype.reset = function(config) {
+        this.initialized = false;
+        this.init(config);
+        return this;
     };
 
     /**
-     * [page description]
-     * @param  {[type]} index [description]
-     * @return {[type]}       [description]
+     * Sets the data source object containing the
+     * array to be paginated.
+     * @param {Array} data Data Array.
+     */
+    GPaginate.prototype.setData = function(data) {
+        if (!data) throw new Error(GPaginate.INVALID_ARGUMENT_ERROR);
+        this.data = data;
+        this.totalPages = Math.ceil(this.data.length / this.pageSize);
+        return this;
+    };
+
+    /**
+     * Gets the current page chunk from the
+     * data source array based on the provided
+     * index.
+     *
+     * @param  {Number} index Pagination index.
+     * @return {Array}        Array slice of `pageSize`
+     *                        length that holds current
+     *                        page.
      */
     GPaginate.prototype.page = function(index) {
 
-        if (!this.total) return this.handleNoPages();
+        if (!this.totalPages) return this.handleNoPages();
 
         index = this.checkLowerBoundary(index);
         index = this.checkUpperBoundary(index);
@@ -149,6 +200,16 @@
             end = start + this.pageSize;
 
         return this.data.slice(start, end);
+    };
+
+    /**
+     * Calculate the current offset
+     *
+     * @private
+     * @return {Number}
+     */
+    GPaginate.prototype.offset = function() {
+        return ((this.current - 1) * this.pageSize);
     };
 
     /**
@@ -182,11 +243,11 @@
      * @return {Number}
      */
     GPaginate.prototype.checkUpperBoundary = function(index) {
-        if (index <= this.total) return index;
+        if (index <= this.totalPages) return index;
 
         this.emit('paginate.end');
 
-        index = this.cycle ? this.startIndex : this.total;
+        index = this.cycle ? this.startIndex : this.totalPages;
 
         return index;
     };
@@ -212,7 +273,7 @@
      * @return {Boolean}
      */
     GPaginate.prototype.hasNext = function() {
-        return this.current < this.total;
+        return this.current < this.totalPages;
     };
 
     GPaginate.prototype.emit = function() {};
