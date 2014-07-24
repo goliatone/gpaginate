@@ -36,6 +36,8 @@ define(['gpaginate'], function(GPaginate) {
             })).toThrow(new Error(GPaginate.INVALID_ARGUMENT_ERROR));
         });
 
+        // it('init should be called on constructor')
+
         it('calculate totalPages based on pageSize', function() {
             paginage.reset({
                 pageSize: 5,
@@ -48,5 +50,8 @@ define(['gpaginate'], function(GPaginate) {
             paginage.setData(new Array(3 * paginage.pageSize));
             expect(paginage.totalPages).toEqual(3);
         });
+
+
+
     });
 });
